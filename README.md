@@ -60,72 +60,122 @@ The hash excludes:
 
 ## Example request payloads
 
-### Facility Alpha
+### Facility Educa (Educa Capital I)
 
 ```json
 {
-   "facility_id": "facility_alpha",
+   "facility_id": "facility_educa",
    "as_of_date": "2026-03-04",
    "portfolio_json": {
       "assets": [
          {
-            "id": "A-001",
-            "principal": "10000.00",
-            "spread_pct": "14.25",
-            "days": 180,
-            "state": "active"
+            "external_id": "EDU-001",
+            "status": "open",
+            "is_eligible": true,
+            "outstanding_amount": "10000.00",
+            "interest_rate_percentage": "18.50",
+            "loan_status": "current"
          },
          {
-            "id": "A-002",
-            "principal": "9000.00",
-            "spread_pct": "11.80",
-            "days": 420,
-            "state": "active"
+            "external_id": "EDU-002",
+            "status": "open",
+            "is_eligible": true,
+            "outstanding_amount": "8300.00",
+            "interest_rate_percentage": null,
+            "loan_status": "current"
          },
          {
-            "id": "A-003",
-            "principal": "7500.00",
-            "spread_pct": "10.50",
-            "days": 120,
-            "state": "closed"
+            "external_id": "EDU-003",
+            "status": "closed",
+            "is_eligible": true,
+            "outstanding_amount": "5000.00",
+            "interest_rate_percentage": "15.20",
+            "loan_status": "current"
          }
       ]
    }
 }
 ```
 
-### Facility Beta
+### Facility PayEarly (PayEarly US)
 
 ```json
 {
-   "facility_id": "facility_beta",
+   "facility_id": "facility_payearly",
    "as_of_date": "2026-03-04",
    "portfolio_json": {
-      "portfolio": {
-         "records": [
-            {
-               "assetId": "B-001",
-               "notional": "25000.00",
-               "coupon": "9.70",
-               "maturityDays": 90,
-               "lifecycle": "performing"
-            },
-            {
-               "assetId": "B-002",
-               "notional": "800.00",
-               "coupon": "12.20",
-               "maturityDays": 120,
-               "lifecycle": "performing"
-            },
-            {
-               "assetId": "B-003",
-               "notional": "6400.00",
-               "coupon": "8.10",
-               "maturityDays": 600,
-               "lifecycle": "performing"
-            }
-         ]
-      }
+      "assets": [
+         {
+            "external_id": "PAY-001",
+            "status": "performing",
+            "is_eligible": true,
+            "outstanding_principal_amount": "2000.00",
+            "total_principal_amount": "2500.00",
+            "total_fee_amount": "75.00",
+            "created_at": "2026-01-10T00:00:00Z",
+            "due_date": "2026-02-10"
+         },
+         {
+            "external_id": "PAY-002",
+            "status": "performing",
+            "is_eligible": false,
+            "outstanding_principal_amount": "1100.00",
+            "total_principal_amount": "1300.00",
+            "total_fee_amount": "39.00",
+            "created_at": "2026-01-05T00:00:00Z",
+            "due_date": "2026-01-20"
+         },
+         {
+            "external_id": "PAY-003",
+            "status": "performing",
+            "is_eligible": true,
+            "outstanding_principal_amount": "0.00",
+            "total_principal_amount": "900.00",
+            "total_fee_amount": "18.00",
+            "created_at": "2026-01-15T00:00:00Z",
+            "due_date": "2026-01-30"
+         }
+      ]
+   }
+}
+```
+
+### Facility Nomina (Nomina Express I)
+
+```json
+{
+   "facility_id": "facility_nomina",
+   "as_of_date": "2026-03-04",
+   "portfolio_json": {
+      "assets": [
+         {
+            "external_id": "NOM-001",
+            "status": "active",
+            "is_eligible": true,
+            "outstanding_amount": "4500.00",
+            "fee_percentage": "0.12",
+            "origination_date": "2026-01-01",
+            "maturity_date": "01/04/2026"
+         },
+         {
+            "external_id": "NOM-002",
+            "status": "active",
+            "is_eligible": false,
+            "outstanding_amount": "2200.00",
+            "fee_percentage": "0.10",
+            "origination_date": "2026-01-15",
+            "maturity_date": "15/03/2026"
+         },
+         {
+            "external_id": "NOM-003",
+            "status": "inactive",
+            "is_eligible": true,
+            "outstanding_amount": "3100.00",
+            "fee_percentage": "0.11",
+            "origination_date": "2026-02-01",
+            "maturity_date": "01/05/2026"
+         }
+      ]
    }
 }
 ```

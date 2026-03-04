@@ -33,10 +33,12 @@ class FacilityBetaMapper:
             normalized.append(
                 NormalizedAsset(
                     asset_id=str(item["assetId"]),
-                    principal=Decimal(str(item["notional"])),
-                    spread=Decimal(str(item["coupon"])),
-                    term_days=int(item["maturityDays"]),
-                    status=str(item["lifecycle"]),
+                    status=str(item.get("lifecycle", "")).lower(),
+                    is_eligible=bool(item.get("is_eligible", True)),
+                    outstanding_amount=Decimal(str(item.get("notional", "0"))),
+                    interest_rate_percentage=Decimal(
+                        str(item.get("coupon", "0"))
+                    ),
                 )
             )
         return normalized

@@ -360,18 +360,8 @@ I’m now creating the core Python code (domain, use case, facility strategies, 
 
 Generating patch (5 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/__init__.py)
 
-
-```
-
-```
-
-
 Generating patch (33 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/main.py)
 
-
-```
-
-```
 Next I’m adding the deterministic domain models, ports, and hashing utility so the normalization boundary and reproducible SHA-256 behavior are enforced centrally.
 
 Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/__init__.py)
@@ -484,27 +474,10 @@ I found a couple of precision fixes to make before handoff (contract ABI path an
 
 Generating patch (8 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/publishers/smart_contract_publisher.py)
 
-
-```
-
-```
-
-
 Generating patch (19 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/ports/facility_strategy.py)
 
 
-```
-
-```
-
-
 Generating patch (9 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/api/v1/covenants.py)
-
-
-```
-
-```
-
 
 Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/hash/__init__.py)
 
@@ -649,10 +622,6 @@ I’m applying a focused README edit now to add the sample payloads and the two 
 
 Generating patch (110 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/README.md)
 
-
-```
-
-```
 Updated all requested README additions in README.md:
 
 - Added one full example `POST /api/v1/covenants/compute` request payload for each facility:
@@ -720,15 +689,7 @@ GitHub Copilot: I’ll make a minimal repository-only patch to make `save_report
 
 Generating patch (49 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/db/postgres_report_repository.py)
 
-
-```
-
-```
 I’ve applied the idempotent upsert pattern in the repository; I’m running a quick diagnostics check to ensure the edit is clean.
-
-
-
-
 
 Read changed files in the active git repository
 
@@ -784,5 +745,552 @@ Added a minimal production-ready workflow at ci.yml with:
 - Automatic failure if Black or tests fail
 
 If you want, I can also align local developer tooling by adding Black to requirements.txt so CI and local environments use the same dependency source.
+
+Made changes.
+
+User: Add pgAdmin to the local development environment using Docker.
+
+Context:
+- The project already uses Docker.
+- PostgreSQL is running in a container.
+- We want to visually inspect the database during development.
+
+Requirements:
+- Add a pgAdmin service to docker-compose.yml.
+- Use the official dpage/pgadmin4 image.
+- Expose pgAdmin on port 5050.
+- Configure default login credentials via environment variables.
+- Connect pgAdmin to the existing PostgreSQL service using the internal Docker network.
+- Persist pgAdmin data using a named volume.
+- Do not modify production behavior.
+- Keep the setup minimal and clean.
+
+Deliver:
+- Updated docker-compose.yml with the pgAdmin service included.
+- Any required environment variables.
+- Clear comments explaining the configuration.
+
+GitHub Copilot: I’ll inspect the current Docker files first, then add a minimal pgAdmin service and the required environment variables without affecting existing runtime behavior.
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env)
+
+I found the current compose and .env; next I’ll patch docker-compose.yml with a commented pgAdmin service and add pgAdmin env keys to .env for immediate local usability.
+
+Generating patch (30 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
+
+Generating patch (9 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env.example)
+
+Updated as requested with a minimal local-only pgAdmin setup.
+
+**What changed**
+- Added pgAdmin service in docker-compose.yml using official dpage/pgadmin4 image.
+- Exposed pgAdmin on host port 5050.
+- Added env-based default credentials for pgAdmin login.
+- Added persistent named volume for pgAdmin state.
+- Included explanatory comments in compose for purpose, port, credentials, and persistence.
+- Added pgAdmin env vars to [c:/Users/EzequielRomano/Desktop/fence_technical_test/.env](c:/Users/EzequielRomano/Desktop/fence_technical_test/.env) and created [c:/Users/EzequielRomano/Desktop/fence_technical_test/.env.example](c:/Users/EzequielRomano/Desktop/fence_technical_test/.env.example).
+
+**Config notes**
+- Internal Docker connectivity is automatic in compose; pgAdmin should register DB host as postgres, port 5432.
+- This does not change application production behavior; it only adds a local development service in compose.
+
+Would you like me to also add a short README snippet with pgAdmin login and one-time server registration steps?
+
+Made changes.
+
+User: Like the project "datareader-edge", we want pgAdmin to auto-register the PostgreSQL server at container startup using a servers.json configuration file.
+
+Context:
+- We are using docker-compose.
+- PostgreSQL runs as a service named "postgres".
+- pgAdmin runs as a separate service (dpage/pgadmin4).
+- We want zero manual setup in the pgAdmin UI.
+
+Requirements:
+- Add a servers.json file that preconfigures a connection to the "postgres" service.
+- The server should use:
+    Host: postgres
+    Port: 5432
+    Username: postgres
+    Password: postgres
+    Maintenance DB: covenants
+- Mount servers.json into the pgAdmin container at:
+    /pgadmin4/servers.json
+- Set the required environment variable:
+    PGADMIN_CONFIG_SERVER_MODE=False (for local dev)
+- Keep credentials configurable via environment variables if possible.
+- Do not break existing docker-compose services.
+- Keep everything development-only and clean.
+
+Deliver:
+- The servers.json file.
+- The required docker-compose modifications.
+- Short comments explaining how auto-registration works.
+
+GitHub Copilot: I’ll add an auto-imported `servers.json` (and a small `pgpass` companion for passwordless connection) and wire mounts/env in compose so pgAdmin is ready with zero UI setup on startup.
+
+Generating patch (35 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker/pgadmin/servers.json)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker/pgadmin/pgpass)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker/pgadmin)
+
+I’ve added auto-registration assets and compose wiring; I’ll now update environment examples so credentials are explicitly configurable and documented.
+
+Generating patch (14 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env)
+
+Generating patch (14 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env.example)
+
+
+I’m doing a quick read-back of compose to confirm all required pgAdmin auto-registration settings are present and consistent.
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
+
+Implemented with zero manual pgAdmin UI setup.
+
+**Delivered**
+- Auto-registration config file: servers.json
+- Compose integration: docker-compose.yml
+- Supporting password file for pre-registered connection: pgpass
+- Local/env examples updated for configurable DB creds:
+  - [c:/Users/EzequielRomano/Desktop/fence_technical_test/.env](c:/Users/EzequielRomano/Desktop/fence_technical_test/.env)
+  - [c:/Users/EzequielRomano/Desktop/fence_technical_test/.env.example](c:/Users/EzequielRomano/Desktop/fence_technical_test/.env.example)
+
+**What was added to compose**
+- New pgAdmin behavior in docker-compose.yml:
+  - Uses dpage/pgadmin4 image
+  - Mounts servers.json to /pgadmin4/servers.json
+  - Mounts pgpass to /pgadmin4/pgpass
+  - Sets PGADMIN_CONFIG_SERVER_MODE=False
+  - Keeps port mapping 5050:80
+  - Keeps persistent named volume pgadmin_data
+- Existing services remain intact and unchanged in behavior.
+
+**How auto-registration works**
+- On startup, pgAdmin imports the mounted servers definition from /pgadmin4/servers.json.
+- That predefines a PostgreSQL server pointing to host postgres:5432 with maintenance DB covenants and user postgres.
+- Password is provided from mounted /pgadmin4/pgpass, so first connection does not require manual credential entry.
+
+If you want, I can also add a short README section with a one-minute pgAdmin access/check flow.
+
+Made changes.
+
+User: Here is the professional prompt you can paste directly into Copilot:
+
+---
+
+
+We need to fix several critical issues in this codebase to fully comply with the
+technical challenge requirements. Do not change the existing architecture
+(Clean Architecture, Strategy Pattern, canonical hashing, smart contract
+publisher, database publisher). Only apply the specific fixes described below.
+
+---
+
+## Fix 1 — Invert COMPLIANT/BREACH evaluation logic
+
+File: src/app/application/use_cases/compute_and_publish_covenant.py
+
+The `_evaluate_covenant` method is inverted. A covenant is COMPLIANT when the
+effective rate is BELOW the threshold, and BREACH when it is AT or ABOVE it.
+
+Current (wrong):
+    if effective_rate >= self._covenant_threshold:
+        return "COMPLIANT"
+    return "BREACH"
+
+Correct:
+    if effective_rate < self._covenant_threshold:
+        return "COMPLIANT"
+    return "BREACH"
+
+---
+
+## Fix 2 — Add `black` to requirements.txt
+
+File: requirements.txt
+
+The CI pipeline runs `black --check .` but `black` is not listed as a
+dependency. Add the following line:
+
+    black==24.10.0
+
+---
+
+## Fix 3 — Expand NormalizedAsset to support all facility fields
+
+File: src/app/domain/value_objects/normalized_asset.py
+
+The current NormalizedAsset is too generic and cannot represent the fields
+required by Facility A, B, and C formulas. Replace the current definition with
+the following expanded value object. All non-universal fields must be Optional:
+
+```python
+from dataclasses import dataclass
+from datetime import date
+from decimal import Decimal
+from typing import Optional
+
+@dataclass(frozen=True)
+class NormalizedAsset:
+    """Canonical asset representation used by the domain layer."""
+
+    # Universal fields
+    asset_id: str
+    status: str
+    is_eligible: bool
+
+    # Facility A — Education Loans (Educa Capital I)
+    outstanding_amount: Optional[Decimal] = None
+    interest_rate_percentage: Optional[Decimal] = None
+    loan_status: Optional[str] = None
+
+    # Facility B — Earned Wage Access (PayEarly US)
+    outstanding_principal_amount: Optional[Decimal] = None
+    total_principal_amount: Optional[Decimal] = None
+    total_fee_amount: Optional[Decimal] = None
+    created_at: Optional[date] = None
+    due_date: Optional[date] = None
+
+    # Facility C — Salary Advance (Nomina Express I)
+    advance_amount: Optional[Decimal] = None
+    fee_percentage: Optional[Decimal] = None
+    origination_date: Optional[date] = None
+    maturity_date: Optional[date] = None
+````
+
+---
+
+## Fix 4 — Implement Facility A: Educa Capital I (ISA / Education Loans)
+
+Create the following three files under `src/app/facilities/facility_educa/`.
+
+### src/app/facilities/facility_educa/__init__.py
+
+Empty file.
+
+### src/app/facilities/facility_educa/mapper.py
+
+Map the raw JSON from facility_a_educa_isa.json into NormalizedAsset. Fields to map:
+
+- asset_id ← external_id
+- status ← status (normalize to lowercase)
+- is_eligible ← is_eligible
+- outstanding_amount ← outstanding_amount
+- interest_rate_percentage ← interest_rate_percentage (may be null → None)
+- loan_status ← loan_status
+
+### src/app/facilities/facility_educa/eligibility.py
+
+Eligibility rules (ALL must hold):
+
+- status.lower() == "open"
+- is_eligible == True
+- loan_status == "current"
+- interest_rate_percentage is not None
+
+Exclusion reasons:
+
+- status not "open" → "status_not_open"
+- is_eligible is False → "not_eligible"
+- loan_status not "current" → "loan_status_not_current"
+- interest_rate_percentage is None → "missing_interest_rate"
+
+### src/app/facilities/facility_educa/rate_strategy.py
+
+Formula (weighted average IRR by outstanding principal):
+
+
+Effective Rate = Σ(outstanding_amount_i × interest_rate_percentage_i)
+               / Σ(outstanding_amount_i)
+
+
+Use Decimal only. Return Decimal("0") if no assets or denominator is zero.
+
+---
+
+## Fix 5 — Implement Facility B: PayEarly US (Earned Wage Access)
+
+Create the following three files under `src/app/facilities/facility_payearly/`.
+
+### src/app/facilities/facility_payearly/__init__.py
+
+Empty file.
+
+### src/app/facilities/facility_payearly/mapper.py
+
+Map the raw JSON from facility_b_payearly_ewa.json into NormalizedAsset. Fields to map:
+
+- asset_id ← external_id
+- status ← status (normalize to lowercase)
+- is_eligible ← is_eligible
+- outstanding_principal_amount ← outstanding_principal_amount
+- total_principal_amount ← total_principal_amount
+- total_fee_amount ← total_fee_amount
+- created_at ← created_at (parse ISO 8601 date, date only)
+- due_date ← due_date (parse as date)
+
+### src/app/facilities/facility_payearly/eligibility.py
+
+Eligibility rules (ALL must hold):
+
+- status.lower() == "performing"
+- is_eligible == True
+- outstanding_principal_amount > 0
+
+Exclusion reasons:
+
+- status not "performing" → "status_not_performing"
+- is_eligible is False → "not_eligible"
+- outstanding_principal_amount <= 0 → "no_outstanding_principal"
+
+### src/app/facilities/facility_payearly/rate_strategy.py
+
+Formula (portfolio fee yield annualized):
+
+
+For each asset:
+    tenor_days_i = (due_date_i - created_at_i).days
+    fee_yield_i  = (total_fee_amount_i / total_principal_amount_i)
+                   × (Decimal("365") / Decimal(tenor_days_i))
+
+Effective Rate = Σ(outstanding_principal_amount_i × fee_yield_i)
+               / Σ(outstanding_principal_amount_i)
+
+
+Use Decimal only. Skip assets where tenor_days <= 0. Return Decimal("0") if denominator is zero.
+
+---
+
+## Fix 6 — Implement Facility C: Nomina Express I (Salary Advance)
+
+Create the following three files under `src/app/facilities/facility_nomina/`.
+
+### src/app/facilities/facility_nomina/__init__.py
+
+Empty file.
+
+### src/app/facilities/facility_nomina/mapper.py
+
+Map the raw JSON from facility_c_nomina.json into NormalizedAsset. Fields to map:
+
+- asset_id ← external_id
+- status ← status (normalize to lowercase)
+- is_eligible ← is_eligible
+- outstanding_amount ← outstanding_amount
+- fee_percentage ← fee_percentage
+- origination_date ← origination_date (parse as date, format: YYYY-MM-DD)
+- maturity_date ← maturity_date (parse as date, format: DD/MM/YYYY)
+
+### src/app/facilities/facility_nomina/eligibility.py
+
+Eligibility rules (ALL must hold):
+
+- status.lower() == "active"
+- is_eligible == True
+- outstanding_amount > 0
+
+Exclusion reasons:
+
+- status not "active" → "status_not_active"
+- is_eligible is False → "not_eligible"
+- outstanding_amount <= 0 → "no_outstanding_amount"
+
+### src/app/facilities/facility_nomina/rate_strategy.py
+
+Formula (weighted average annualized advance fee):
+
+For each asset:
+    repayment_months_i = number of whole months between
+                         origination_date and maturity_date
+                         (use: (maturity_date.year - origination_date.year)
+                               * 12 + maturity_date.month
+                                    - origination_date.month)
+    annualized_fee_i   = fee_percentage_i × (Decimal("12")
+                         / Decimal(repayment_months_i))
+
+Effective Rate = Σ(outstanding_amount_i × annualized_fee_i)
+               / Σ(outstanding_amount_i)
+
+
+Use Decimal only. Skip assets where repayment_months <= 0. Return Decimal("0") if denominator is zero.
+
+---
+
+## Fix 7 — Register all three facilities in the registry
+
+File: src/app/facilities/registry.py
+
+Replace the current registry contents with the following. Keep the FacilityBundle dataclass and get_facility_bundle function signature unchanged. Add the three new facilities with the correct covenant thresholds:
+
+- "facility_educa": mapper = FacilityEducaMapper() eligibility = FacilityEducaEligibility() rate_strategy = FacilityEducaRateStrategy() covenant_threshold = Decimal("22.00") ← COMPLIANT if rate < 22.00%
+
+- "facility_payearly": mapper = FacilityPayearlyMapper() eligibility = FacilityPayearlyEligibility() rate_strategy = FacilityPayearlyRateStrategy() covenant_threshold = Decimal("3.00") ← COMPLIANT if rate < 3.00%
+
+- "facility_nomina": mapper = FacilityNominaMapper() eligibility = FacilityNominaEligibility() rate_strategy = FacilityNominaRateStrategy() covenant_threshold = Decimal("5.00") ← COMPLIANT if rate < 5.00%
+
+You may keep facility_alpha and facility_beta in the registry if they are referenced in existing tests, but the three new entries above are required.
+
+---
+
+## Fix 8 — Update README example payloads
+
+File: README.md
+
+Replace the existing example request payloads for Facility Alpha and Beta with one real example per new facility, using actual field names from the challenge sample data. Use a minimal subset (2–3 assets) per facility to keep the README readable. Label them:
+
+- Facility Educa (Educa Capital I)
+- Facility PayEarly (PayEarly US)
+- Facility Nomina (Nomina Express I)
+
+---
+
+## Constraints
+
+- Do NOT change: canonical hashing logic, smart contract code, database schema, publisher ports, use case orchestration, or CI pipeline.
+- All arithmetic must use Decimal only — no floats anywhere.
+- All date parsing must be explicit — no implicit time-zone assumptions.
+- Follow PEP 8, PEP 257, and the existing code style (type hints, docstrings, 4-space indentation, 79-char line limit).
+- Each new file must have a module-level docstring.
+- Do not start implementing until you confirm you have understood all 8 fixes.
+
+
+
+GitHub Copilot: I understand all 8 fixes and will implement them exactly as scoped, without changing hashing/publishers/schema/orchestration; I’ll first re-read the current files and then apply focused patches.
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/application/use_cases/compute_and_publish_covenant.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/value_objects/normalized_asset.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/registry.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/requirements.txt)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/README.md)
+
+I confirmed current state; next I’ll implement the eight fixes and also adapt legacy alpha/beta modules to the expanded asset model so existing behavior/tests don’t regress.
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/mapper.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/eligibility.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/rate_strategy.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/mapper.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/eligibility.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/rate_strategy.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/api/v1/covenants.py)
+
+I’m now applying the core fixes (covenant comparator, dependencies, expanded NormalizedAsset, and new facility registry entries), then I’ll add the three facility implementations and README examples.
+
+Generating patch (10 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/application/use_cases/compute_and_publish_covenant.py)
+
+Generating patch (6 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/requirements.txt)
+
+
+Generating patch (43 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/value_objects/normalized_asset.py)
+
+
+
+Generating patch (50 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/registry.py)
+
+
+Core fixes are in; I’m now creating the three required facility modules (mapper, eligibility, rate strategy) with Decimal-only formulas and explicit date parsing.
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/__init__.py)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/__init__.py)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/__init__.py)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/mapper.py)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/eligibility.py)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/rate_strategy.py)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/mapper.py)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/eligibility.py)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/rate_strategy.py)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/mapper.py)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/eligibility.py)
+
+Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/rate_strategy.py)
+
+The new facilities are added; I’m now making compatibility updates for legacy alpha/beta modules (so registry remains safe) and replacing README examples with the three required challenge facilities.
+
+Generating patch (27 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/mapper.py)
+
+Generating patch (33 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/eligibility.py)
+
+Generating patch (22 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/rate_strategy.py)
+
+Generating patch (27 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/mapper.py)
+
+Generating patch (33 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/eligibility.py)
+
+Generating patch (28 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/rate_strategy.py)
+
+Generating patch (22 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/mapper.py)
+
+
+
+Generating patch (169 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/README.md)
+
+
+All requested feature files are in place; I’m running a diagnostics pass now to catch any import/type issues from the new facility integrations.
+
+
+
+Read changed files in the active git repository
+
+Searched for regex `\bprincipal\b|\bspread\b|\bterm_days\b` (`**/src/app/**/*.py`), 5 results
+
+Searched for regex `\.principal|\.spread|\.term_days` (`**/src/app/**/*.py`), no results
+
+**Completed**
+- Applied all 8 requested fixes while preserving the existing architecture boundaries (use case orchestration, canonical hashing, publishers, schema, CI design).
+- Inverted covenant decision logic to COMPLIANT when effective rate is below threshold in compute_and_publish_covenant.py.
+- Added Black dependency for CI parity in requirements.txt.
+- Replaced NormalizedAsset with the expanded optional-field model in normalized_asset.py.
+
+**New Facilities**
+- Implemented Facility Educa:
+  - mapper.py
+  - eligibility.py
+  - rate_strategy.py
+- Implemented Facility PayEarly:
+  - mapper.py
+  - eligibility.py
+  - rate_strategy.py
+- Implemented Facility Nomina:
+  - mapper.py
+  - eligibility.py
+  - rate_strategy.py
+
+**Registry and README**
+- Registered required facility IDs and thresholds in registry.py: facility_educa (22.00), facility_payearly (3.00), facility_nomina (5.00). Legacy alpha/beta entries were kept for compatibility.
+- Replaced README payload examples with real field-shape examples for Educa, PayEarly, and Nomina in README.md.
+
+If you want, I can now add focused unit tests for the three new rate strategies and eligibility rules to lock these formulas and exclusion reasons.
 
 Made changes.

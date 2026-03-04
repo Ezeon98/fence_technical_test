@@ -14,6 +14,19 @@ from app.facilities.facility_alpha.rate_strategy import FacilityAlphaRateStrateg
 from app.facilities.facility_beta.eligibility import FacilityBetaEligibility
 from app.facilities.facility_beta.mapper import FacilityBetaMapper
 from app.facilities.facility_beta.rate_strategy import FacilityBetaRateStrategy
+from app.facilities.facility_educa.eligibility import FacilityEducaEligibility
+from app.facilities.facility_educa.mapper import FacilityEducaMapper
+from app.facilities.facility_educa.rate_strategy import FacilityEducaRateStrategy
+from app.facilities.facility_nomina.eligibility import FacilityNominaEligibility
+from app.facilities.facility_nomina.mapper import FacilityNominaMapper
+from app.facilities.facility_nomina.rate_strategy import FacilityNominaRateStrategy
+from app.facilities.facility_payearly.eligibility import (
+    FacilityPayearlyEligibility,
+)
+from app.facilities.facility_payearly.mapper import FacilityPayearlyMapper
+from app.facilities.facility_payearly.rate_strategy import (
+    FacilityPayearlyRateStrategy,
+)
 
 
 @dataclass(frozen=True)
@@ -29,6 +42,24 @@ class FacilityBundle:
 def get_facility_bundle(facility_id: str) -> FacilityBundle:
     """Resolve a facility strategy bundle by identifier."""
     mapping: dict[str, FacilityBundle] = {
+        "facility_educa": FacilityBundle(
+            mapper=FacilityEducaMapper(),
+            eligibility=FacilityEducaEligibility(),
+            rate_strategy=FacilityEducaRateStrategy(),
+            covenant_threshold=Decimal("22.00"),
+        ),
+        "facility_payearly": FacilityBundle(
+            mapper=FacilityPayearlyMapper(),
+            eligibility=FacilityPayearlyEligibility(),
+            rate_strategy=FacilityPayearlyRateStrategy(),
+            covenant_threshold=Decimal("3.00"),
+        ),
+        "facility_nomina": FacilityBundle(
+            mapper=FacilityNominaMapper(),
+            eligibility=FacilityNominaEligibility(),
+            rate_strategy=FacilityNominaRateStrategy(),
+            covenant_threshold=Decimal("5.00"),
+        ),
         "facility_alpha": FacilityBundle(
             mapper=FacilityAlphaMapper(),
             eligibility=FacilityAlphaEligibility(),

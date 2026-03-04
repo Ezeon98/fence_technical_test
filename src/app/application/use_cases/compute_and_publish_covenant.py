@@ -86,7 +86,7 @@ class ComputeAndPublishCovenantUseCase:
 
     def _evaluate_covenant(self, effective_rate: Decimal) -> str:
         """Evaluate covenant status against facility threshold."""
-        if effective_rate >= self._covenant_threshold:
+        if effective_rate < self._covenant_threshold:
             return "COMPLIANT"
         return "BREACH"
 

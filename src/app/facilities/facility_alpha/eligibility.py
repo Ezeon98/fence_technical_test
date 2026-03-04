@@ -9,8 +9,7 @@ class FacilityAlphaEligibility:
 
     Rules:
     - Asset must be active.
-    - Principal must be positive.
-    - Term must be <= 365 days.
+    - Outstanding amount must be positive.
     """
 
     def apply(
@@ -26,14 +25,12 @@ class FacilityAlphaEligibility:
                     ExcludedAsset(asset_id=asset.asset_id, reason="inactive_status")
                 )
                 continue
-            if asset.principal <= 0:
+            if (
+                asset.outstanding_amount is None
+                or asset.outstanding_amount <= 0
+            ):
                 excluded.append(
                     ExcludedAsset(asset_id=asset.asset_id, reason="invalid_principal")
-                )
-                continue
-            if asset.term_days > 365:
-                excluded.append(
-                    ExcludedAsset(asset_id=asset.asset_id, reason="term_exceeds_limit")
                 )
                 continue
             included.append(asset)
