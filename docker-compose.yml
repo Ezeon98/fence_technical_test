@@ -2,13 +2,40 @@ services:
   postgres:
     image: postgres:16
     environment:
-      POSTGRES_DB: covenants
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-covenants}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  # pgAdmin is enabled for local development only to inspect PostgreSQL data.
+  # It connects to `postgres` through the default internal Docker network.
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    environment:
+      # Default login for pgAdmin web UI.
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      # Local-dev desktop mode; enables direct server management.
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      # Re-import mounted servers.json on each startup (dev convenience).
+      PGADMIN_REPLACE_SERVERS_ON_STARTUP: "True"
+    ports:
+      # Expose pgAdmin at http://localhost:5050
+      - "5050:80"
+    volumes:
+      # Auto-register PostgreSQL server in pgAdmin on container startup.
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+      # Provide DB password used by the pre-registered server connection.
+      - ./docker/pgadmin/pgpass:/pgadmin4/pgpass:ro
+      # Persist pgAdmin servers and user configuration between restarts.
+      - pgadmin_data:/var/lib/pgadmin
 
   anvil:
     image: ghcr.io/foundry-rs/foundry:latest
@@ -29,3 +56,4 @@ services:
 
 volumes:
   postgres_data:
+  pgadmin_data:

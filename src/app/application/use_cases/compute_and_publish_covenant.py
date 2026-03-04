@@ -90,7 +90,9 @@ class ComputeAndPublishCovenantUseCase:
             return "COMPLIANT"
         return "BREACH"
 
-    def _publish_to_chain(self, report: CovenantReport, report_id: int) -> dict[str, Any]:
+    def _publish_to_chain(
+        self, report: CovenantReport, report_id: int
+    ) -> dict[str, Any]:
         """Attempt blockchain publication with graceful error handling."""
         chain_result = self._smart_contract_publisher.publish(report)
         if chain_result.success:
