@@ -25,10 +25,7 @@ class FacilityAlphaEligibility:
                     ExcludedAsset(asset_id=asset.asset_id, reason="inactive_status")
                 )
                 continue
-            if (
-                asset.outstanding_amount is None
-                or asset.outstanding_amount <= 0
-            ):
+            if asset.outstanding_amount is None or asset.outstanding_amount <= 0:
                 excluded.append(
                     ExcludedAsset(asset_id=asset.asset_id, reason="invalid_principal")
                 )

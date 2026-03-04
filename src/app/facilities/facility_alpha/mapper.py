@@ -34,9 +34,7 @@ class FacilityAlphaMapper:
                     status=str(item.get("state", "")).lower(),
                     is_eligible=bool(item.get("is_eligible", True)),
                     outstanding_amount=Decimal(str(item.get("principal", "0"))),
-                    interest_rate_percentage=Decimal(
-                        str(item.get("spread_pct", "0"))
-                    ),
+                    interest_rate_percentage=Decimal(str(item.get("spread_pct", "0"))),
                 )
             )
         return normalized

@@ -25,10 +25,7 @@ class FacilityBetaEligibility:
                     ExcludedAsset(asset_id=asset.asset_id, reason="non_performing")
                 )
                 continue
-            if (
-                asset.outstanding_amount is None
-                or asset.outstanding_amount < 1000
-            ):
+            if asset.outstanding_amount is None or asset.outstanding_amount < 1000:
                 excluded.append(
                     ExcludedAsset(asset_id=asset.asset_id, reason="below_minimum")
                 )

@@ -3,6 +3,12 @@
 Deterministic FastAPI backend for facility-specific covenant computation,
 hashing, persistence, and blockchain publication.
 
+## Requirements
+
+- Python 3.11+
+- Docker and Docker Compose
+- PostgreSQL 16 (local or dockerized)
+
 ## Architecture highlights
 
 - Explicit normalization boundary through `NormalizedAsset`.
@@ -52,11 +58,52 @@ The hash excludes:
 4. Put deployed address into `.env` as `CONTRACT_ADDRESS`.
 5. Restart API service.
 
+## Configuration
+
+Main environment variables (see `.env.example`):
+
+- `DATABASE_URL`: PostgreSQL connection used by the API.
+- `TEST_DATABASE_URL`: Optional override used by integration tests.
+- `RPC_URL`, `CHAIN_ID`, `DEPLOYER_PRIVATE_KEY`, `CONTRACT_ADDRESS`:
+   Smart-contract publishing settings.
+
 ## API
 
 - `POST /api/v1/covenants/compute`
 - `GET /api/v1/covenants/{report_id}`
 - `GET /health`
+
+## Testing and CI
+
+Run all tests locally:
+
+```bash
+pytest -q
+```
+
+Run integration tests only:
+
+```bash
+pytest -q tests/integration
+```
+
+Run integration tests against dockerized PostgreSQL:
+
+```bash
+docker compose run --rm \
+   -e TEST_DATABASE_URL=postgresql://postgres:postgres@postgres:5432/covenants_test \
+   api pytest -q tests/integration
+```
+
+Integration tests in `tests/integration/test_covenant_flow.py` validate:
+
+- End-to-end covenant flow for `facility_educa`, `facility_payearly`, and
+   `facility_nomina`.
+- Deterministic outputs: `effective_rate`, `covenant_status`,
+   `included_asset_ids`, `excluded_assets_with_reasons`, and `report_hash`.
+- Real database behavior with `PostgresReportRepository`, including
+   `ON CONFLICT` idempotency, unique `report_hash`, JSONB persistence, and
+   transaction commit behavior.
 
 ## Example request payloads
 

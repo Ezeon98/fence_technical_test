@@ -26,9 +26,7 @@ class FacilityPayearlyMapper:
                     total_principal_amount=Decimal(
                         str(item.get("total_principal_amount", "0"))
                     ),
-                    total_fee_amount=Decimal(
-                        str(item.get("total_fee_amount", "0"))
-                    ),
+                    total_fee_amount=Decimal(str(item.get("total_fee_amount", "0"))),
                     created_at=self._parse_iso_date(item.get("created_at")),
                     due_date=self._parse_iso_date(item.get("due_date")),
                 )

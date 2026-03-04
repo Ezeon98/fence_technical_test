@@ -20,9 +20,7 @@ class FacilityAlphaRateStrategy:
                 continue
             if asset.interest_rate_percentage is None:
                 continue
-            numerator += (
-                asset.outstanding_amount * asset.interest_rate_percentage
-            )
+            numerator += asset.outstanding_amount * asset.interest_rate_percentage
             denominator += asset.outstanding_amount
 
         if denominator == 0:

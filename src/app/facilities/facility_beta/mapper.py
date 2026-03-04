@@ -36,9 +36,7 @@ class FacilityBetaMapper:
                     status=str(item.get("lifecycle", "")).lower(),
                     is_eligible=bool(item.get("is_eligible", True)),
                     outstanding_amount=Decimal(str(item.get("notional", "0"))),
-                    interest_rate_percentage=Decimal(
-                        str(item.get("coupon", "0"))
-                    ),
+                    interest_rate_percentage=Decimal(str(item.get("coupon", "0"))),
                 )
             )
         return normalized

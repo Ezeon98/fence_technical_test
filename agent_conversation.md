@@ -1294,3 +1294,535 @@ Searched for regex `\.principal|\.spread|\.term_days` (`**/src/app/**/*.py`), no
 If you want, I can now add focused unit tests for the three new rate strategies and eligibility rules to lock these formulas and exclusion reasons.
 
 Made changes.
+
+User: Follow instructions in [development.prompt.md](vscode-userdata:/c%3A/Users/EzequielRomano/AppData/Roaming/Code/User/prompts/development.prompt.md).
+Add integration tests that validate the full covenant flow for the three facilities (e.g., facility_educa and the other two defined in the fixtures).
+
+Requirements:
+
+For each facility:
+
+Load the portfolio input.
+
+Execute the full report generation use case.
+
+Assert:
+
+effective_rate
+
+covenant_status
+
+included_asset_ids
+
+excluded_assets_with_reasons
+
+Deterministic report_hash
+
+Add an idempotency test:
+
+Execute the same facility twice.
+
+Assert that the same report_id is returned.
+
+Ensure no duplicate row is created.
+
+Tests must:
+Use Decimal only (no floats).
+Be compatible with the existing CI pipeline.
+
+GitHub Copilot: I’ll first inspect the project conventions and existing test fixtures to design integration tests that match your architecture and CI constraints, then I’ll present a concrete test design for your confirmation before editing files.
+
+Searched for files matching `**/tests/**/*`, 4 matches
+
+Read [](vscode-userdata:/c%3A/Users/EzequielRomano/AppData/Roaming/Code/User/prompts/python.instructions.md)
+
+Read memory
+
+
+## Proposed Test Design
+
+### Objective
+Add integration tests that execute the complete `ComputeAndPublishCovenantUseCase` flow for three facilities (`facility_educa`, `facility_payearly`, `facility_nomina`) and verify deterministic outputs plus idempotency.
+
+### Scope
+- New file: `tests/integration/test_covenant_flow.py`
+- No production code changes planned.
+- No new dependencies planned.
+
+### Structure and Integration Points
+- Build realistic portfolio fixtures (same domain shapes used by current mappers).
+- Resolve strategies through `get_facility_bundle(...)`.
+- Execute real use case: mapper -> eligibility -> rate strategy -> hash -> database publisher -> blockchain publisher hook.
+- Use an in-memory test repository implementing `ReportRepository` to:
+  - emulate idempotent persistence by `report_hash`
+  - track number of unique stored rows for duplicate checks
+- Use a deterministic fake smart-contract publisher to keep CI stable and avoid external services.
+
+### Assertions Per Facility
+- `effective_rate` (`Decimal` only)
+- `covenant_status`
+- `included_asset_ids`
+- `excluded_assets_with_reasons`
+- deterministic `report_hash` (stable value check via deterministic expected hash path)
+
+### Idempotency Test
+- Execute same facility payload twice.
+- Assert same `report_id`.
+- Assert repository row count remains `1` (no duplicate insert).
+
+### CI Compatibility
+- Pure in-process tests (`pytest`), no Docker/Postgres/chain dependency.
+- Decimal-only literals/operations (no float literals).
+
+Does this design meet your expectations, or do you want me to adjust anything before I implement it?## Proposed Test Design
+
+### Objective
+Add integration tests that execute the complete `ComputeAndPublishCovenantUseCase` flow for three facilities (`facility_educa`, `facility_payearly`, `facility_nomina`) and verify deterministic outputs plus idempotency.
+
+### Scope
+- New file: `tests/integration/test_covenant_flow.py`
+- No production code changes planned.
+- No new dependencies planned.
+
+### Structure and Integration Points
+- Build realistic portfolio fixtures (same domain shapes used by current mappers).
+- Resolve strategies through `get_facility_bundle(...)`.
+- Execute real use case: mapper -> eligibility -> rate strategy -> hash -> database publisher -> blockchain publisher hook.
+- Use an in-memory test repository implementing `ReportRepository` to:
+  - emulate idempotent persistence by `report_hash`
+  - track number of unique stored rows for duplicate checks
+- Use a deterministic fake smart-contract publisher to keep CI stable and avoid external services.
+
+### Assertions Per Facility
+- `effective_rate` (`Decimal` only)
+- `covenant_status`
+- `included_asset_ids`
+- `excluded_assets_with_reasons`
+- deterministic `report_hash` (stable value check via deterministic expected hash path)
+
+### Idempotency Test
+- Execute same facility payload twice.
+- Assert same `report_id`.
+- Assert repository row count remains `1` (no duplicate insert).
+
+### CI Compatibility
+- Pure in-process tests (`pytest`), no Docker/Postgres/chain dependency.
+- Decimal-only literals/operations (no float literals).
+
+Does this design meet your expectations, or do you want me to adjust anything before I implement it?
+
+User: The design is mostly correct, but I want one important adjustment:
+
+The integration tests must use the real PostgresReportRepository against a test database (not an in-memory fake repository).
+
+Reason:
+I want to validate:
+
+ON CONFLICT behavior
+
+JSONB persistence
+
+Unique constraint on report_hash
+
+Real transaction commit behavior
+
+You may:
+
+Use a dedicated test database
+
+Or run tests against the existing dockerized Postgres service
+
+The blockchain publisher can remain a deterministic fake to keep CI stable.
+
+Everything else in your proposal is correct.
+
+Proceed with this adjustment.
+
+GitHub Copilot: I’ll now implement the tests using the real `PostgresReportRepository` with DB-backed setup/cleanup fixtures, then add assertions for `ON CONFLICT` idempotency and persisted JSONB payloads.
+
+Searched for files matching `**/.env*`, 1 match
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/settings.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env.example)
+
+I confirmed settings are env-driven, so I’ll make tests override `DATABASE_URL` to a dedicated test DB URL and isolate table state per test while still exercising real commits and constraints.
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/hash/canonical_hash.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/requirements.txt)
+
+I’m ready to add a new integration test module that wires the real Postgres repository, provisions/cleans a dedicated test DB, and validates full-flow outputs plus idempotency at the database level.
+
+Generating patch (438 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py)
+
+
+```
+
+```
+
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py#1-1), lines 1 to 420
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py#420-420), lines 420 to 435
+
+Checked [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py), no problems found
+
+Implemented with the requested adjustment: integration tests now use the real `PostgresReportRepository` against PostgreSQL, while keeping blockchain publication deterministic and fake.
+
+### What I changed
+- Added test_covenant_flow.py with:
+1. Real DB-backed full-flow tests for:
+- `facility_educa`
+- `facility_payearly`
+- `facility_nomina`
+
+2. Assertions per facility for:
+- `effective_rate`
+- `covenant_status`
+- `included_asset_ids`
+- `excluded_assets_with_reasons`
+- deterministic `report_hash`
+
+3. Persistence-level checks (real Postgres):
+- JSONB fields are validated by reading persisted rows (`included_asset_ids`, `excluded_assets_with_reasons`)
+- hash uniqueness behavior is verified via DB queries
+
+4. Idempotency test:
+- Executes the same facility payload twice
+- Verifies the same `report_id` is returned
+- Verifies only one DB row exists for that `report_hash`
+- Verifies only one total row exists in the table for that test
+
+5. Test DB environment setup:
+- Uses `TEST_DATABASE_URL` if provided
+- Falls back to `postgresql://postgres:postgres@localhost:5432/covenants_test`
+- Ensures test DB exists
+- Initializes schema
+- Truncates `covenant_reports` before each test (`RESTART IDENTITY`)
+- Clears cached settings (`get_settings.cache_clear`) so env overrides take effect
+
+### File added
+- test_covenant_flow.py
+
+### Notes
+- I did not run test commands, per your attached process instruction.
+- This is CI-friendly as long as PostgreSQL is reachable through `TEST_DATABASE_URL` (or the localhost fallback). If PostgreSQL is unavailable, the integration module skips with a clear message.
+
+If you want, I can next add a short `README` testing section documenting `TEST_DATABASE_URL` for CI and local runs.
+
+Made changes.
+
+User: Follow instructions in [development.prompt.md](vscode-userdata:/c%3A/Users/EzequielRomano/AppData/Roaming/Code/User/prompts/development.prompt.md).
+Add integration tests that validate the full covenant flow for the three facilities (e.g., facility_educa and the other two defined in the fixtures).
+
+Requirements:
+
+For each facility:
+
+Load the portfolio input.
+
+Execute the full report generation use case.
+
+Assert:
+
+effective_rate
+
+covenant_status
+
+included_asset_ids
+
+excluded_assets_with_reasons
+
+Deterministic report_hash
+
+Add an idempotency test:
+
+Execute the same facility twice.
+
+Assert that the same report_id is returned.
+
+Ensure no duplicate row is created.
+
+Tests must:
+Use Decimal only (no floats).
+Be compatible with the existing CI pipeline.
+
+GitHub Copilot: I’ll first inspect the project conventions and existing test fixtures to design integration tests that match your architecture and CI constraints, then I’ll present a concrete test design for your confirmation before editing files.
+
+Searched for files matching `**/tests/**/*`, 4 matches
+
+Read [](vscode-userdata:/c%3A/Users/EzequielRomano/AppData/Roaming/Code/User/prompts/python.instructions.md)
+
+Read memory
+
+I found only unit tests plus a shared conftest.py, so I’m now reading the fixtures and full covenant flow entrypoints to anchor the integration coverage precisely.
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/application/use_cases/compute_and_publish_covenant.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/conftest.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/api/v1/covenants.py)
+
+Next I’m locating the existing facility fixtures/data and repository behavior to build deterministic end-to-end tests without guessing expected values.
+
+Searched for regex `facility_educa|facility_beta|facility_alpha|facility_nomina|facility_payearly`, 20 results
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/registry.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/README.md)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/db/postgres_report_repository.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/publishers/database_publisher.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/db/postgres.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/unit/test_rate_conversion.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/unit/test_canonical_hash.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/publishers/smart_contract_publisher.py)
+
+I now have the persistence/idempotency behavior; I’m reading the three facility strategies to compute exact expected outputs for robust integration assertions.
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/mapper.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/eligibility.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/rate_strategy.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/mapper.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/eligibility.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/rate_strategy.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/mapper.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/eligibility.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/rate_strategy.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/value_objects/covenant_report.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/ports/report_repository.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/ports/publisher.py)
+
+## Proposed Test Design
+
+### Objective
+Add integration tests that execute the complete `ComputeAndPublishCovenantUseCase` flow for three facilities (`facility_educa`, `facility_payearly`, `facility_nomina`) and verify deterministic outputs plus idempotency.
+
+### Scope
+- New file: `tests/integration/test_covenant_flow.py`
+- No production code changes planned.
+- No new dependencies planned.
+
+### Structure and Integration Points
+- Build realistic portfolio fixtures (same domain shapes used by current mappers).
+- Resolve strategies through `get_facility_bundle(...)`.
+- Execute real use case: mapper -> eligibility -> rate strategy -> hash -> database publisher -> blockchain publisher hook.
+- Use an in-memory test repository implementing `ReportRepository` to:
+  - emulate idempotent persistence by `report_hash`
+  - track number of unique stored rows for duplicate checks
+- Use a deterministic fake smart-contract publisher to keep CI stable and avoid external services.
+
+### Assertions Per Facility
+- `effective_rate` (`Decimal` only)
+- `covenant_status`
+- `included_asset_ids`
+- `excluded_assets_with_reasons`
+- deterministic `report_hash` (stable value check via deterministic expected hash path)
+
+### Idempotency Test
+- Execute same facility payload twice.
+- Assert same `report_id`.
+- Assert repository row count remains `1` (no duplicate insert).
+
+### CI Compatibility
+- Pure in-process tests (`pytest`), no Docker/Postgres/chain dependency.
+- Decimal-only literals/operations (no float literals).
+
+Does this design meet your expectations, or do you want me to adjust anything before I implement it?## Proposed Test Design
+
+### Objective
+Add integration tests that execute the complete `ComputeAndPublishCovenantUseCase` flow for three facilities (`facility_educa`, `facility_payearly`, `facility_nomina`) and verify deterministic outputs plus idempotency.
+
+### Scope
+- New file: `tests/integration/test_covenant_flow.py`
+- No production code changes planned.
+- No new dependencies planned.
+
+### Structure and Integration Points
+- Build realistic portfolio fixtures (same domain shapes used by current mappers).
+- Resolve strategies through `get_facility_bundle(...)`.
+- Execute real use case: mapper -> eligibility -> rate strategy -> hash -> database publisher -> blockchain publisher hook.
+- Use an in-memory test repository implementing `ReportRepository` to:
+  - emulate idempotent persistence by `report_hash`
+  - track number of unique stored rows for duplicate checks
+- Use a deterministic fake smart-contract publisher to keep CI stable and avoid external services.
+
+### Assertions Per Facility
+- `effective_rate` (`Decimal` only)
+- `covenant_status`
+- `included_asset_ids`
+- `excluded_assets_with_reasons`
+- deterministic `report_hash` (stable value check via deterministic expected hash path)
+
+### Idempotency Test
+- Execute same facility payload twice.
+- Assert same `report_id`.
+- Assert repository row count remains `1` (no duplicate insert).
+
+### CI Compatibility
+- Pure in-process tests (`pytest`), no Docker/Postgres/chain dependency.
+- Decimal-only literals/operations (no float literals).
+
+Does this design meet your expectations, or do you want me to adjust anything before I implement it?
+
+User: The design is mostly correct, but I want one important adjustment:
+
+The integration tests must use the real PostgresReportRepository against a test database (not an in-memory fake repository).
+
+Reason:
+I want to validate:
+
+ON CONFLICT behavior
+
+JSONB persistence
+
+Unique constraint on report_hash
+
+Real transaction commit behavior
+
+You may:
+
+Use a dedicated test database
+
+Or run tests against the existing dockerized Postgres service
+
+The blockchain publisher can remain a deterministic fake to keep CI stable.
+
+Everything else in your proposal is correct.
+
+Proceed with this adjustment.
+
+GitHub Copilot: I’ll now implement the tests using the real `PostgresReportRepository` with DB-backed setup/cleanup fixtures, then add assertions for `ON CONFLICT` idempotency and persisted JSONB payloads.
+
+Searched for files matching `**/.env*`, 1 match
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/settings.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env.example)
+
+I confirmed settings are env-driven, so I’ll make tests override `DATABASE_URL` to a dedicated test DB URL and isolate table state per test while still exercising real commits and constraints.
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/hash/canonical_hash.py)
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/requirements.txt)
+
+I’m ready to add a new integration test module that wires the real Postgres repository, provisions/cleans a dedicated test DB, and validates full-flow outputs plus idempotency at the database level.
+
+Generating patch (438 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py)
+
+
+```
+
+```
+
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py#1-1), lines 1 to 420
+
+Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py#420-420), lines 420 to 435
+
+Checked [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py), no problems found
+
+Implemented with the requested adjustment: integration tests now use the real `PostgresReportRepository` against PostgreSQL, while keeping blockchain publication deterministic and fake.
+
+### What I changed
+- Added test_covenant_flow.py with:
+1. Real DB-backed full-flow tests for:
+- `facility_educa`
+- `facility_payearly`
+- `facility_nomina`
+
+2. Assertions per facility for:
+- `effective_rate`
+- `covenant_status`
+- `included_asset_ids`
+- `excluded_assets_with_reasons`
+- deterministic `report_hash`
+
+3. Persistence-level checks (real Postgres):
+- JSONB fields are validated by reading persisted rows (`included_asset_ids`, `excluded_assets_with_reasons`)
+- hash uniqueness behavior is verified via DB queries
+
+4. Idempotency test:
+- Executes the same facility payload twice
+- Verifies the same `report_id` is returned
+- Verifies only one DB row exists for that `report_hash`
+- Verifies only one total row exists in the table for that test
+
+5. Test DB environment setup:
+- Uses `TEST_DATABASE_URL` if provided
+- Falls back to `postgresql://postgres:postgres@localhost:5432/covenants_test`
+- Ensures test DB exists
+- Initializes schema
+- Truncates `covenant_reports` before each test (`RESTART IDENTITY`)
+- Clears cached settings (`get_settings.cache_clear`) so env overrides take effect
+
+### File added
+- test_covenant_flow.py
+
+### Notes
+- I did not run test commands, per your attached process instruction.
+- This is CI-friendly as long as PostgreSQL is reachable through `TEST_DATABASE_URL` (or the localhost fallback). If PostgreSQL is unavailable, the integration module skips with a clear message.
+
+If you want, I can next add a short `README` testing section documenting `TEST_DATABASE_URL` for CI and local runs.
+
+Made changes.
+
+User: Follow instructions in [documentation.prompt.md](vscode-userdata:/c%3A/Users/EzequielRomano/AppData/Roaming/Code/User/prompts/documentation.prompt.md).
+in english
+
+GitHub Copilot: I’ll read your `documentation.prompt.md` instructions first, then apply them to document the new integration test flow in clear English.
+
+I’ve loaded the documentation constraints, and next I’ll update only documentation files in English (no logic changes), focusing on how to run and understand the new Postgres-backed integration tests.
+
+Read changed files in the active git repository
+
+I’m now updating documentation only: adding an English testing section in README.md and a `CHANGELOG.md` entry for the new Postgres-backed integration tests.
+
+
+Read changed files in the active git repository
+
+## Documentation Generated
+
+### Files Modified
+- README.md: Added English sections for requirements, configuration, and testing/CI, including how to run Postgres-backed integration tests with `TEST_DATABASE_URL`.
+
+### Summary of Changes
+- **Project docs**:
+  - Added a clear **Requirements** section in README.md.
+  - Added a **Configuration** section documenting key environment variables:
+    - `DATABASE_URL`
+    - `TEST_DATABASE_URL`
+    - blockchain-related settings
+  - Added a **Testing and CI** section with commands for:
+    - full test suite
+    - integration-only suite
+    - dockerized execution against PostgreSQL
+  - Documented what the integration tests validate:
+    - deterministic report fields and hash
+    - real `PostgresReportRepository` behavior (`ON CONFLICT`, unique `report_hash`, JSONB persistence, commit behavior)
+
+
+No functional code logic was modified.
+
+Made changes.

@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src ./src
 COPY contracts ./contracts
 COPY scripts ./scripts
+COPY tests ./tests
 
 ENV PYTHONPATH=/app/src
 EXPOSE 8000

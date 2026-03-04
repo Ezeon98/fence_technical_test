@@ -24,9 +24,7 @@ class FacilityNominaMapper:
                         str(item.get("outstanding_amount", "0"))
                     ),
                     fee_percentage=Decimal(str(item.get("fee_percentage", "0"))),
-                    origination_date=self._parse_ymd(
-                        item.get("origination_date")
-                    ),
+                    origination_date=self._parse_ymd(item.get("origination_date")),
                     maturity_date=self._parse_dmy(item.get("maturity_date")),
                 )
             )
