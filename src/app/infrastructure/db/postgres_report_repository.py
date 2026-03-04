@@ -1,7 +1,5 @@
 """PostgreSQL report repository implementation."""
 
-import json
-
 from app.domain.ports.report_repository import ReportRepository
 from app.domain.value_objects.covenant_report import CovenantReport
 from app.infrastructure.db.postgres import get_connection, to_json
@@ -25,7 +23,13 @@ class PostgresReportRepository(ReportRepository):
             report_hash
         )
         VALUES (%s, %s, %s, %s, %s, %s::jsonb, %s::jsonb, %s)
+        ON CONFLICT (report_hash) DO NOTHING
         RETURNING id;
+        """
+        select_sql = """
+        SELECT id
+        FROM covenant_reports
+        WHERE report_hash = %s;
         """
         excluded = [
             {"asset_id": item.asset_id, "reason": item.reason}
@@ -48,6 +52,12 @@ class PostgresReportRepository(ReportRepository):
                     ),
                 )
                 row = cursor.fetchone()
+
+                # If no row was returned, the insert conflicted due to UNIQUE(report_hash).
+                # We fetch the existing row to make the operation idempotent.
+                if row is None:
+                    cursor.execute(select_sql, (report.report_hash,))
+                    row = cursor.fetchone()
             connection.commit()
 
         if row is None:

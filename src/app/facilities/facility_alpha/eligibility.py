@@ -22,19 +22,13 @@ class FacilityAlphaEligibility:
 
         for asset in assets:
             if asset.status.lower() != "active":
-                excluded.append(
-                    ExcludedAsset(asset_id=asset.asset_id, reason="inactive_status")
-                )
+                excluded.append(ExcludedAsset(asset_id=asset.asset_id, reason="inactive_status"))
                 continue
             if asset.principal <= 0:
-                excluded.append(
-                    ExcludedAsset(asset_id=asset.asset_id, reason="invalid_principal")
-                )
+                excluded.append(ExcludedAsset(asset_id=asset.asset_id, reason="invalid_principal"))
                 continue
             if asset.term_days > 365:
-                excluded.append(
-                    ExcludedAsset(asset_id=asset.asset_id, reason="term_exceeds_limit")
-                )
+                excluded.append(ExcludedAsset(asset_id=asset.asset_id, reason="term_exceeds_limit"))
                 continue
             included.append(asset)
 

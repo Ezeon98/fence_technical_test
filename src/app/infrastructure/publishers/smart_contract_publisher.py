@@ -21,9 +21,7 @@ class SmartContractPublisher(Publisher):
         self._chain_id = settings.chain_id
         self._private_key = settings.deployer_private_key
         self._contract_address = settings.contract_address
-        abi_path = Path(__file__).resolve().parents[5] / "contracts" / (
-            "CovenantRegistry.abi.json"
-        )
+        abi_path = Path("contracts/CovenantRegistry.abi.json")
         self._abi = json.loads(abi_path.read_text(encoding="utf-8"))
 
     def publish(self, report: CovenantReport) -> PublicationResult:

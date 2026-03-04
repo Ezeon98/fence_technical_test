@@ -19,7 +19,6 @@ from app.infrastructure.publishers.smart_contract_publisher import (
     SmartContractPublisher,
 )
 
-
 router = APIRouter(prefix="/covenants", tags=["covenants"])
 
 

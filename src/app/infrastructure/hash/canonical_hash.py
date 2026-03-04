@@ -6,7 +6,6 @@ from decimal import Decimal, ROUND_HALF_UP
 
 from app.domain.value_objects.covenant_report import CovenantReport
 
-
 TWO_DECIMAL = Decimal("0.01")
 
 
@@ -22,10 +21,7 @@ def _sorted_excluded(report: CovenantReport) -> list[dict[str, str]]:
         report.excluded_assets_with_reasons,
         key=lambda item: (item.asset_id, item.reason),
     )
-    return [
-        {"asset_id": item.asset_id, "reason": item.reason}
-        for item in sorted_items
-    ]
+    return [{"asset_id": item.asset_id, "reason": item.reason} for item in sorted_items]
 
 
 def canonical_report_payload(report: CovenantReport) -> dict:

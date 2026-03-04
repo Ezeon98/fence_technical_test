@@ -15,7 +15,6 @@ from app.domain.ports.report_repository import ReportRepository
 from app.domain.value_objects.covenant_report import CovenantReport
 from app.infrastructure.hash.canonical_hash import compute_report_hash
 
-
 TWO_DECIMAL = Decimal("0.01")
 
 
@@ -91,9 +90,7 @@ class ComputeAndPublishCovenantUseCase:
             return "COMPLIANT"
         return "BREACH"
 
-    def _publish_to_chain(
-        self, report: CovenantReport, report_id: int
-    ) -> dict[str, Any]:
+    def _publish_to_chain(self, report: CovenantReport, report_id: int) -> dict[str, Any]:
         """Attempt blockchain publication with graceful error handling."""
         chain_result = self._smart_contract_publisher.publish(report)
         if chain_result.success:

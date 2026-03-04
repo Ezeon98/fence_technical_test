@@ -22,19 +22,13 @@ class FacilityBetaEligibility:
 
         for asset in assets:
             if asset.status.lower() != "performing":
-                excluded.append(
-                    ExcludedAsset(asset_id=asset.asset_id, reason="non_performing")
-                )
+                excluded.append(ExcludedAsset(asset_id=asset.asset_id, reason="non_performing"))
                 continue
             if asset.principal < 1000:
-                excluded.append(
-                    ExcludedAsset(asset_id=asset.asset_id, reason="below_minimum")
-                )
+                excluded.append(ExcludedAsset(asset_id=asset.asset_id, reason="below_minimum"))
                 continue
             if asset.term_days > 540:
-                excluded.append(
-                    ExcludedAsset(asset_id=asset.asset_id, reason="term_exceeds_limit")
-                )
+                excluded.append(ExcludedAsset(asset_id=asset.asset_id, reason="term_exceeds_limit"))
                 continue
             included.append(asset)
 
