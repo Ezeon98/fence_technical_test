@@ -48,6 +48,22 @@ The hash excludes:
 - `postgres`: full report persistence
 - `anvil`: local EVM chain
 
+## Docker debug attach (VS Code)
+
+Run the API with remote debug enabled by setting these variables in `.env`:
+
+- `DEBUG=true`
+- `DEBUG_PORT=3002` (optional, default `3002`)
+
+Then start the stack:
+
+```bash
+docker compose up --build
+```
+
+In VS Code, run the `Python: Attach to API in Docker` launch config to attach
+the debugger to the running `api` container.
+
 ## Setup
 
 1. Copy `.env.example` to `.env`.
@@ -255,3 +271,86 @@ Integration tests in `tests/integration/test_covenant_flow.py` validate:
 - **Retry strategy for blockchain publishing**: Add idempotent retry workers
    with bounded exponential backoff, dead-letter handling, and reconciliation
    jobs for failed on-chain submissions.
+
+
+## How the covenant model shaped the architecture
+
+A covenant is not simply a computed metric — it is a contractual obligation
+between two parties (Capital Provider and Asset Originator) who do not share
+a single trusted system. Once published, the rate must be:
+
+- **Independently verifiable**: either party must be able to reproduce the
+  exact same value from the same inputs, without relying on Fence as
+  intermediary.
+- **Tamper-evident**: no party, including Fence itself, should be able to
+  silently alter a published result after the fact.
+- **Consequential**: the rate can automatically trigger downstream actions
+  (disbursement pauses, cap reviews, waterfall adjustments), so correctness
+  and finality are non-negotiable.
+
+These three properties drove the following concrete decisions:
+
+**Canonical hashing over raw persistence.** Storing the full report in a
+database is not sufficient for a covenant. A database record can be updated
+or deleted. The SHA-256 hash over a deterministically ordered subset of the
+report (facility, date, rate, status, asset lists) means any party can
+recompute the hash independently and detect any tampering. The hash is
+the covenant fingerprint.
+
+**Blockchain publication as shared trust anchor.** Publishing the hash
+on-chain removes the need for either party to trust Fence's database. The
+smart contract is neutral ground: neither the Capital Provider nor the Asset
+Originator controls it, and the transaction hash provides an immutable
+timestamp. This is why blockchain publication is treated as a first-class
+output, not a nice-to-have.
+
+## Reasoning and assumptions
+
+**Status normalization is case-insensitive.**
+The sample data contains inconsistent casing for the same logical value
+(`"open"`, `"Open"`, `"OPEN"`). All mappers normalize status to lowercase
+before applying eligibility rules, treating these as equivalent. This is
+assumed to be a data quality issue on the originator side, not intentional
+differentiation.
+
+**`as_of_date` is metadata, not a filter.**
+The challenge does not specify that assets should be filtered by date. The
+`as_of_date` field is included in the covenant report and its hash as a
+reference timestamp — it documents *when* the computation was run, but does
+not exclude assets whose `effective_date` or `origination_date` falls after
+it. If date-based filtering were required, it would need to be defined
+per-facility in the Credit Agreement.
+
+**`is_eligible` is treated as an explicit override.**
+Even if an asset passes all other eligibility criteria, `is_eligible: false`
+always excludes it. This flag is assumed to represent a manual or upstream
+system override that takes precedence over formula-based rules.
+
+**Repayment months uses whole calendar months.**
+For Facility C, `repayment_months` is computed as the difference in calendar
+months between `origination_date` and `maturity_date`, without rounding or
+day-level adjustment. This matches the formula in the Credit Agreement and
+avoids introducing precision that the agreement does not define.
+
+**Tenor days for Facility B uses calendar days.**
+`tenor_days` is the raw difference in days between `created_at` and
+`due_date`. No business-day calendar or holiday adjustment is applied, as
+none is specified in the Credit Agreement.
+
+**Assets with zero denominator are excluded gracefully.**
+If all eligible assets have zero outstanding principal (or outstanding
+amount), the effective rate returns `0.00` rather than raising an error.
+This prevents a single bad portfolio snapshot from crashing the computation
+pipeline.
+
+**The smart contract stores only the hash, not the full report.**
+Storing the full report on-chain would be cost-prohibitive and unnecessary.
+The hash is sufficient for independent verification: any party with the
+original report data can recompute the hash and compare it against the
+on-chain record. The full report is persisted in PostgreSQL for operational
+queries and audits.
+
+**Blockchain publication uses a local Anvil chain for this implementation.**
+A production deployment would target a public or permissioned EVM-compatible
+network. The publisher interface is network-agnostic — swapping the RPC URL
+and contract address is sufficient to target any chain.

@@ -53,6 +53,16 @@ services:
       - anvil
     ports:
       - "8000:8000"
+      - "3002:3002"
+    command:
+      - sh
+      - -c
+      - |
+        if [ "${DEBUG:-false}" = "true" ]; then
+          python -m debugpy --listen 0.0.0.0:${DEBUG_PORT:-3002} -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload;
+        else
+          uvicorn app.main:app --host 0.0.0.0 --port 8000;
+        fi
 
 volumes:
   postgres_data:

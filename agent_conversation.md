@@ -43,10 +43,6 @@ Created 4 todos
 
 I’m now reading the required Python conventions and checking the workspace layout so the design matches your standards from the start.
 
-Read [](vscode-userdata:/c%3A/Users/EzequielRomano/AppData/Roaming/Code/User/prompts/python.instructions.md)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test)
-
 I found the mandatory Python guidelines and confirmed the workspace is effectively empty, so I’ll propose a full FastAPI architecture from scratch with clear extension points per facility and then ask for final choices on persistence/blockchain details.
 
 Starting: *Analyze backend requirements* (2/4)
@@ -358,128 +354,27 @@ Starting: *Scaffold project structure* (1/6)
 
 I’m now creating the core Python code (domain, use case, facility strategies, hashing, persistence, and API) with deterministic rules and the canonical hash boundary exactly as specified.
 
-Generating patch (5 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/__init__.py)
-
-Generating patch (33 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/main.py)
 
 Next I’m adding the deterministic domain models, ports, and hashing utility so the normalization boundary and reproducible SHA-256 behavior are enforced centrally.
 
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/value_objects/normalized_asset.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/value_objects/covenant_report.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/ports/publisher.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/ports/report_repository.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/ports/facility_strategy.py)
-
 Core domain boundaries are in place, including `NormalizedAsset` and the publisher/repository ports; next I’ll wire deterministic hashing plus the compute-and-publish use case and then connect facility modules.
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/settings.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/hash/canonical_hash.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/application/use_cases/compute_and_publish_covenant.py)
 
 I’m wiring facility-specific mappers and strategies now, then I’ll connect the use case into API endpoints and infrastructure adapters.
 
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/registry.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/mapper.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/eligibility.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/rate_strategy.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/mapper.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/eligibility.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/rate_strategy.py)
-
 Facility-specific mappers and rules are added under the required paths; I’ll now connect PostgreSQL persistence, smart-contract publishing, and the FastAPI endpoints end-to-end.
 
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/db/postgres.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/db/postgres_report_repository.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/publishers/database_publisher.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/publishers/smart_contract_publisher.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/api/v1/covenants.py)
 
 I’ve connected the main compute/persist/publish flow; next I’m adding the Solidity contract, Anvil Docker setup, and project docs/config so the stack is reproducible end-to-end.
 
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/contracts/CovenantRegistry.sol)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/contracts/CovenantRegistry.abi.json)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/scripts/deploy_contract.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/requirements.txt)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/Dockerfile)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env.example)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.gitignore)
 
 The infrastructure stack is now scaffolded (API/Postgres/Anvil + contract artifacts); I’ll finish with package init files, tests for deterministic hashing/rate conversion, and README usage instructions.
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/api/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/api/v1/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/application/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/application/use_cases/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/ports/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/value_objects/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/db/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/publishers/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/unit/test_canonical_hash.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/unit/test_rate_conversion.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/README.md)
 
 I’m doing a quick static error pass now to catch integration issues (imports/types/paths) before finalizing.
 
 Checked workspace, no problems found
 
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/publishers/smart_contract_publisher.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/ports/facility_strategy.py)
-
 I found a couple of precision fixes to make before handoff (contract ABI path and rate strategy typing), and I’m applying those now.
 
-Generating patch (8 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/publishers/smart_contract_publisher.py)
-
-Generating patch (19 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/ports/facility_strategy.py)
-
-
-Generating patch (9 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/api/v1/covenants.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/hash/__init__.py)
 
 I’ve applied the integration fixes; I’ll do one final error sweep and then summarize exactly what was implemented against your constraints.
 
@@ -526,23 +421,9 @@ I want explicit confirmation of these invariants before we finalize.
 
 GitHub Copilot: I’ll quickly verify each invariant directly from the implemented files and then provide a concise checklist with exact payload shape and execution order.
 
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/hash/canonical_hash.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/application/use_cases/compute_and_publish_covenant.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/contracts/CovenantRegistry.sol)
-
 Searched for regex `float\(|\bfloat\b` (`**/src/**/*.py`), no results
 
 I’m doing one extra focused scan on strategy modules to explicitly confirm Decimal-only computation paths and deterministic sorting at the facility level.
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/rate_strategy.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/rate_strategy.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/eligibility.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/eligibility.py)
 
 Searched for regex `float\(|\bfloat\b` (`**/src/app/**/*.py`), no results
 
@@ -616,11 +497,8 @@ User: Proceed to:
 
 GitHub Copilot: I’ll update the README with concrete per-facility request examples plus concise rationale and production-evolution guidance, keeping it aligned with the current implementation.
 
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/README.md)
 
 I’m applying a focused README edit now to add the sample payloads and the two requested explanatory sections without changing runtime behavior.
-
-Generating patch (110 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/README.md)
 
 Updated all requested README additions in README.md:
 
@@ -687,7 +565,6 @@ Proceed with a minimal, clean modification.
 
 GitHub Copilot: I’ll make a minimal repository-only patch to make `save_report` idempotent using `ON CONFLICT DO NOTHING`, then verify no errors were introduced.
 
-Generating patch (49 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/db/postgres_report_repository.py)
 
 I’ve applied the idempotent upsert pattern in the repository; I’m running a quick diagnostics check to ensure the edit is clean.
 
@@ -772,17 +649,7 @@ Deliver:
 
 GitHub Copilot: I’ll inspect the current Docker files first, then add a minimal pgAdmin service and the required environment variables without affecting existing runtime behavior.
 
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env)
-
 I found the current compose and .env; next I’ll patch docker-compose.yml with a commented pgAdmin service and add pgAdmin env keys to .env for immediate local usability.
-
-Generating patch (30 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
-
-Generating patch (9 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env.example)
 
 Updated as requested with a minimal local-only pgAdmin setup.
 
@@ -833,24 +700,9 @@ Deliver:
 
 GitHub Copilot: I’ll add an auto-imported `servers.json` (and a small `pgpass` companion for passwordless connection) and wire mounts/env in compose so pgAdmin is ready with zero UI setup on startup.
 
-Generating patch (35 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker/pgadmin/servers.json)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker/pgadmin/pgpass)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker/pgadmin)
-
 I’ve added auto-registration assets and compose wiring; I’ll now update environment examples so credentials are explicitly configurable and documented.
 
-Generating patch (14 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env)
-
-Generating patch (14 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env.example)
-
-
 I’m doing a quick read-back of compose to confirm all required pgAdmin auto-registration settings are present and consistent.
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
 
 Implemented with zero manual pgAdmin UI setup.
 
@@ -1161,100 +1013,16 @@ Replace the existing example request payloads for Facility Alpha and Beta with o
 - Do not start implementing until you confirm you have understood all 8 fixes.
 
 
-
 GitHub Copilot: I understand all 8 fixes and will implement them exactly as scoped, without changing hashing/publishers/schema/orchestration; I’ll first re-read the current files and then apply focused patches.
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/application/use_cases/compute_and_publish_covenant.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/value_objects/normalized_asset.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/registry.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/requirements.txt)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/README.md)
 
 I confirmed current state; next I’ll implement the eight fixes and also adapt legacy alpha/beta modules to the expanded asset model so existing behavior/tests don’t regress.
 
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/mapper.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/eligibility.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/rate_strategy.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/mapper.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/eligibility.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/rate_strategy.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/api/v1/covenants.py)
-
 I’m now applying the core fixes (covenant comparator, dependencies, expanded NormalizedAsset, and new facility registry entries), then I’ll add the three facility implementations and README examples.
-
-Generating patch (10 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/application/use_cases/compute_and_publish_covenant.py)
-
-Generating patch (6 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/requirements.txt)
-
-
-Generating patch (43 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/value_objects/normalized_asset.py)
-
-
-
-Generating patch (50 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/registry.py)
-
 
 Core fixes are in; I’m now creating the three required facility modules (mapper, eligibility, rate strategy) with Decimal-only formulas and explicit date parsing.
 
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/__init__.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/mapper.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/eligibility.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/rate_strategy.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/mapper.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/eligibility.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/rate_strategy.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/mapper.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/eligibility.py)
-
-Created [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/rate_strategy.py)
 
 The new facilities are added; I’m now making compatibility updates for legacy alpha/beta modules (so registry remains safe) and replacing README examples with the three required challenge facilities.
-
-Generating patch (27 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/mapper.py)
-
-Generating patch (33 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/eligibility.py)
-
-Generating patch (22 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_alpha/rate_strategy.py)
-
-Generating patch (27 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/mapper.py)
-
-Generating patch (33 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/eligibility.py)
-
-Generating patch (28 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_beta/rate_strategy.py)
-
-Generating patch (22 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/mapper.py)
-
-
-
-Generating patch (169 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/README.md)
 
 
 All requested feature files are in place; I’m running a diagnostics pass now to catch any import/type issues from the new facility integrations.
@@ -1331,13 +1099,6 @@ Use Decimal only (no floats).
 Be compatible with the existing CI pipeline.
 
 GitHub Copilot: I’ll first inspect the project conventions and existing test fixtures to design integration tests that match your architecture and CI constraints, then I’ll present a concrete test design for your confirmation before editing files.
-
-Searched for files matching `**/tests/**/*`, 4 matches
-
-Read [](vscode-userdata:/c%3A/Users/EzequielRomano/AppData/Roaming/Code/User/prompts/python.instructions.md)
-
-Read memory
-
 
 ## Proposed Test Design
 
@@ -1442,33 +1203,11 @@ GitHub Copilot: I’ll now implement the tests using the real `PostgresReportRep
 
 Searched for files matching `**/.env*`, 1 match
 
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/settings.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env.example)
-
 I confirmed settings are env-driven, so I’ll make tests override `DATABASE_URL` to a dedicated test DB URL and isolate table state per test while still exercising real commits and constraints.
 
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/hash/canonical_hash.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/requirements.txt)
 
 I’m ready to add a new integration test module that wires the real Postgres repository, provisions/cleans a dedicated test DB, and validates full-flow outputs plus idempotency at the database level.
 
-Generating patch (438 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py)
-
-
-```
-
-```
-
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py#1-1), lines 1 to 420
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py#420-420), lines 420 to 435
-
-Checked [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py), no problems found
 
 Implemented with the requested adjustment: integration tests now use the real `PostgresReportRepository` against PostgreSQL, while keeping blockchain publication deterministic and fake.
 
@@ -1554,63 +1293,9 @@ GitHub Copilot: I’ll first inspect the project conventions and existing test f
 
 Searched for files matching `**/tests/**/*`, 4 matches
 
-Read [](vscode-userdata:/c%3A/Users/EzequielRomano/AppData/Roaming/Code/User/prompts/python.instructions.md)
-
-Read memory
-
 I found only unit tests plus a shared conftest.py, so I’m now reading the fixtures and full covenant flow entrypoints to anchor the integration coverage precisely.
 
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/application/use_cases/compute_and_publish_covenant.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/conftest.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/api/v1/covenants.py)
-
 Next I’m locating the existing facility fixtures/data and repository behavior to build deterministic end-to-end tests without guessing expected values.
-
-Searched for regex `facility_educa|facility_beta|facility_alpha|facility_nomina|facility_payearly`, 20 results
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/registry.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/README.md)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/db/postgres_report_repository.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/publishers/database_publisher.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/db/postgres.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/unit/test_rate_conversion.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/unit/test_canonical_hash.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/publishers/smart_contract_publisher.py)
-
-I now have the persistence/idempotency behavior; I’m reading the three facility strategies to compute exact expected outputs for robust integration assertions.
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/mapper.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/eligibility.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_educa/rate_strategy.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/mapper.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/eligibility.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_payearly/rate_strategy.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/mapper.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/eligibility.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/facilities/facility_nomina/rate_strategy.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/value_objects/covenant_report.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/ports/report_repository.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/domain/ports/publisher.py)
 
 ## Proposed Test Design
 
@@ -1715,33 +1400,11 @@ GitHub Copilot: I’ll now implement the tests using the real `PostgresReportRep
 
 Searched for files matching `**/.env*`, 1 match
 
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/settings.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/docker-compose.yml)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/.env.example)
-
 I confirmed settings are env-driven, so I’ll make tests override `DATABASE_URL` to a dedicated test DB URL and isolate table state per test while still exercising real commits and constraints.
 
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/src/app/infrastructure/hash/canonical_hash.py)
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/requirements.txt)
 
 I’m ready to add a new integration test module that wires the real Postgres repository, provisions/cleans a dedicated test DB, and validates full-flow outputs plus idempotency at the database level.
 
-Generating patch (438 lines) in [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py)
-
-
-```
-
-```
-
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py#1-1), lines 1 to 420
-
-Read [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py#420-420), lines 420 to 435
-
-Checked [](file:///c%3A/Users/EzequielRomano/Desktop/fence_technical_test/tests/integration/test_covenant_flow.py), no problems found
 
 Implemented with the requested adjustment: integration tests now use the real `PostgresReportRepository` against PostgreSQL, while keeping blockchain publication deterministic and fake.
 
@@ -1826,3 +1489,57 @@ Read changed files in the active git repository
 No functional code logic was modified.
 
 Made changes.
+
+
+USER: Follow instructions in init.prompt.md.
+
+Github Copilot: 
+Inspecting workspace instructions and conventions
+
+I’m going to initialize the workspace customization following that prompt: first I’ll discover the existing conventions and then I’ll generate/update copilot-instructions.md with a useful and non-redundant version for this repository.
+
+Searched for multiple configuration and instruction files
+
+I found that this repository doesn’t appear to have a clear agent guide in the quick search yet. Now I’m going to read the agent-customization skill and the project files to extract commands, architecture, and risks before writing the final instruction file.
+
+Reviewed 3 files and planned codebase exploration
+
+With this I now have context about the repository. Next, I’ll load the official workspace instructions template and run an exploration sub-agent to extract concrete commands and patterns and write a precise guide.
+
+Explore: Map project conventions
+
+Read skill agent-customization.
+
+Reviewed output file and planned instructions file
+
+With the exploration complete, I’m going to generate copilot-instructions.md (the single workspace instruction file) with minimal and actionable sections: architecture, commands, conventions, and real pitfalls of this repository.
+
+Created copilot-instructions.md
+
+The bootstrap has been created in copilot-instructions.md with project-specific content and without duplicating long documentation. I’ll quickly validate that there is no conflicting AGENTS.md and then share some prompt examples to test it.
+
+Searched for files matching AGENTS.md and copilot-instructions.md
+
+The workspace was bootstrapped as requested following init.prompt.md: I created the project copilot-instructions file and consolidated the real conventions of the repository.
+
+Created file:
+
+copilot-instructions.md
+
+What it includes:
+
+Architecture and boundaries (domain/application vs infrastructure, facilities by strategy, central registry).
+
+Canonical run and test commands (docker compose, contract deployment, pytest).
+
+Critical determinism conventions (Decimal, stable canonical hash, on-chain graceful degradation).
+
+Docker debugging with attach (DEBUG=true, DEBUG_PORT=3002, VS Code configuration).
+
+Common pitfalls (CONTRACT_ADDRESS, facility_id, TEST_DATABASE_URL).
+
+Quick validation:
+
+There is no AGENTS.md in this workspace, so there is no conflicting standard.
+
+A single workspace instruction file remains, as recommended by the skill.
