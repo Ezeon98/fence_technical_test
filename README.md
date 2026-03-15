@@ -145,7 +145,7 @@ Integration tests in `tests/integration/test_covenant_flow.py` validate:
          "repaid_amount": 1625.00,
          "interest_rate_percentage": 20.86,
          "days_past_due": 0,
-         "country": "ES",
+         "country": "US",
          "amount": 6500.00
          },
          {
@@ -196,7 +196,7 @@ Integration tests in `tests/integration/test_covenant_flow.py` validate:
          "repaid_amount": 750.00,
          "interest_rate_percentage": 16.20,
          "days_past_due": 0,
-         "country": "ES",
+         "country": "AR",
          "amount": 15000.00
          },
          {

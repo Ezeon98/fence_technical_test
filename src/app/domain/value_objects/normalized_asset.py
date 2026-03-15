@@ -28,3 +28,4 @@ class NormalizedAsset:
     fee_percentage: Optional[Decimal] = None
     origination_date: Optional[date] = None
     maturity_date: Optional[date] = None
+    country: Optional[str] = None

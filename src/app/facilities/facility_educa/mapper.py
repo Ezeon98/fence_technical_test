@@ -29,6 +29,7 @@ class FacilityEducaMapper:
                         else None
                     ),
                     loan_status=item.get("loan_status"),
+                    country=item.get("country").lower(),
                 )
             )
         return normalized

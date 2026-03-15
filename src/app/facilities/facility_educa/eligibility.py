@@ -20,6 +20,11 @@ class FacilityEducaEligibility:
                     ExcludedAsset(asset_id=asset.asset_id, reason="status_not_open")
                 )
                 continue
+            if asset.country != "es":
+                excluded.append(
+                    ExcludedAsset(asset_id=asset.asset_id, reason="country_not_es")
+                )
+                continue
             if not asset.is_eligible:
                 excluded.append(
                     ExcludedAsset(asset_id=asset.asset_id, reason="not_eligible")
