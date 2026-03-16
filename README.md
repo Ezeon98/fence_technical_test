@@ -82,10 +82,14 @@ Main environment variables (see `.env.example`):
 - `TEST_DATABASE_URL`: Optional override used by integration tests.
 - `RPC_URL`, `CHAIN_ID`, `DEPLOYER_PRIVATE_KEY`, `CONTRACT_ADDRESS`:
    Smart-contract publishing settings.
+- `SQS_QUEUE_URL`, `SQS_DLQ_URL`: Source queue and dead-letter queue URLs.
+- `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`:
+   AWS credentials and region for SQS access.
 
 ## API
 
 - `POST /api/v1/covenants/compute`
+- `POST /api/v1/covenants/process-sqs-messages`
 - `GET /api/v1/covenants/{report_id}`
 - `GET /health`
 

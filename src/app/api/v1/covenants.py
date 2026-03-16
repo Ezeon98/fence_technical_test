@@ -6,18 +6,16 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from app.application.use_cases.compute_and_publish_covenant import (
-    ComputeAndPublishCovenantUseCase,
+from app.application.services.covenant_processing_service import (
+    CovenantProcessingService,
 )
-from app.facilities.registry import get_facility_bundle
-from app.infrastructure.db.postgres_report_repository import (
-    PostgresReportRepository,
+from app.application.services.sqs_message_processor import (
+    SqsMessageProcessor,
+    SqsProcessingSummary,
 )
 from app.infrastructure.hash.canonical_hash import format_rate_two_decimals
-from app.infrastructure.publishers.database_publisher import DatabasePublisher
-from app.infrastructure.publishers.smart_contract_publisher import (
-    SmartContractPublisher,
-)
+from app.infrastructure.settings import get_settings
+from app.infrastructure.sqs.sqs_client import SqsClient
 
 router = APIRouter(prefix="/covenants", tags=["covenants"])
 
@@ -59,33 +57,19 @@ class ComputeCovenantResponse(BaseModel):
     blockchain_publication: dict[str, Any]
 
 
-@router.post("/compute", response_model=ComputeCovenantResponse)
-def compute_covenant(payload: ComputeCovenantRequest) -> ComputeCovenantResponse:
-    """Compute, persist, and publish covenant for a facility payload."""
-    try:
-        facility_bundle = get_facility_bundle(payload.facility_id)
-    except ValueError as error:
-        raise HTTPException(status_code=400, detail=str(error)) from error
+class ProcessSqsMessagesResponse(BaseModel):
+    """Response schema for SQS batch processing endpoint."""
 
-    repository = PostgresReportRepository()
-    database_publisher = DatabasePublisher(repository=repository)
-    smart_publisher = SmartContractPublisher()
+    polled_messages: int
+    processed_successfully: int
+    sent_to_dlq: int
+    errors: list[str]
 
-    use_case = ComputeAndPublishCovenantUseCase(
-        mapper=facility_bundle.mapper,
-        eligibility=facility_bundle.eligibility,
-        rate_strategy=facility_bundle.rate_strategy,
-        covenant_threshold=facility_bundle.covenant_threshold,
-        report_repository=repository,
-        database_publisher=database_publisher,
-        smart_contract_publisher=smart_publisher,
-    )
-    result = use_case.execute(
-        facility_id=payload.facility_id,
-        as_of_date=payload.as_of_date,
-        raw_portfolio=payload.portfolio_json,
-    )
 
+def _build_compute_covenant_response(
+    result: dict[str, Any],
+) -> ComputeCovenantResponse:
+    """Map use-case output into API response schema."""
     report = result["report"]
     response_report = CovenantReportSchema(
         facility_id=report.facility_id,
@@ -106,6 +90,64 @@ def compute_covenant(payload: ComputeCovenantRequest) -> ComputeCovenantResponse
         report=response_report,
         database_publication=result["database_publication"],
         blockchain_publication=result["blockchain_publication"],
+    )
+
+
+def _build_sqs_client() -> SqsClient:
+    """Construct SQS client from environment-backed settings."""
+    settings = get_settings()
+    return SqsClient(
+        aws_access_key_id=settings.aws_access_key_id,
+        aws_secret_access_key=settings.aws_secret_access_key,
+        region_name=settings.aws_region,
+    )
+
+
+@router.post("/compute", response_model=ComputeCovenantResponse)
+def compute_covenant(payload: ComputeCovenantRequest) -> ComputeCovenantResponse:
+    """Compute, persist, and publish covenant for a facility payload."""
+    try:
+        service = CovenantProcessingService()
+        result = service.process(
+            facility_id=payload.facility_id,
+            as_of_date=payload.as_of_date,
+            portfolio_json=payload.portfolio_json,
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+
+    return _build_compute_covenant_response(result)
+
+
+@router.post(
+    "/process-sqs-messages",
+    response_model=ProcessSqsMessagesResponse,
+)
+def process_sqs_messages() -> ProcessSqsMessagesResponse:
+    """Poll source SQS queue and process covenant messages in batch."""
+    settings = get_settings()
+    if not settings.sqs_queue_url:
+        raise HTTPException(status_code=500, detail="Missing SQS_QUEUE_URL.")
+    if not settings.sqs_dlq_url:
+        raise HTTPException(status_code=500, detail="Missing SQS_DLQ_URL.")
+    if not settings.aws_access_key_id:
+        raise HTTPException(status_code=500, detail="Missing AWS_ACCESS_KEY_ID.")
+    if not settings.aws_secret_access_key:
+        raise HTTPException(status_code=500, detail="Missing AWS_SECRET_ACCESS_KEY.")
+
+    processor = SqsMessageProcessor(
+        sqs_client=_build_sqs_client(),
+        covenant_processing_service=CovenantProcessingService(),
+        queue_url=settings.sqs_queue_url,
+        dlq_url=settings.sqs_dlq_url,
+    )
+    summary: SqsProcessingSummary = processor.process_messages()
+
+    return ProcessSqsMessagesResponse(
+        polled_messages=summary.polled_messages,
+        processed_successfully=summary.processed_successfully,
+        sent_to_dlq=summary.sent_to_dlq,
+        errors=summary.errors,
     )
 
 

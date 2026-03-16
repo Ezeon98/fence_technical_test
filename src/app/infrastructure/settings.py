@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     contract_address: str = ""
     debug: bool = False
     debug_port: int = 3002
+    sqs_queue_url: str = ""
+    sqs_dlq_url: str = ""
+    aws_access_key_id: str = ""
+    aws_secret_access_key: str = ""
+    aws_region: str = "us-east-1"
 
 
 @lru_cache(maxsize=1)
